@@ -10,33 +10,80 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as InstructorRouteImport } from './routes/instructor'
+import { Route as RoleRouteImport } from './routes/role'
+import { Route as StudentRouteImport } from './routes/student'
+import { Route as SessionPracticalIdRouteImport } from './routes/session.$practicalId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InstructorRoute = InstructorRouteImport.update({
+  id: '/instructor',
+  path: '/instructor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RoleRoute = RoleRouteImport.update({
+  id: '/role',
+  path: '/role',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudentRoute = StudentRouteImport.update({
+  id: '/student',
+  path: '/student',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SessionPracticalIdRoute = SessionPracticalIdRouteImport.update({
+  id: '/session/$practicalId',
+  path: '/session/$practicalId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/instructor': typeof InstructorRoute
+  '/role': typeof RoleRoute
+  '/student': typeof StudentRoute
+  '/session/$practicalId': typeof SessionPracticalIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/instructor': typeof InstructorRoute
+  '/role': typeof RoleRoute
+  '/student': typeof StudentRoute
+  '/session/$practicalId': typeof SessionPracticalIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/instructor': typeof InstructorRoute
+  '/role': typeof RoleRoute
+  '/student': typeof StudentRoute
+  '/session/$practicalId': typeof SessionPracticalIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    '/' | '/instructor' | '/role' | '/student' | '/session/$practicalId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/instructor' | '/role' | '/student' | '/session/$practicalId'
+  id:
+    | '__root__'
+    | '/'
+    | '/instructor'
+    | '/role'
+    | '/student'
+    | '/session/$practicalId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  InstructorRoute: typeof InstructorRoute
+  RoleRoute: typeof RoleRoute
+  StudentRoute: typeof StudentRoute
+  SessionPracticalIdRoute: typeof SessionPracticalIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,22 +95,44 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/instructor': {
+      id: '/instructor'
+      path: '/instructor'
+      fullPath: '/instructor'
+      preLoaderRoute: typeof InstructorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/role': {
+      id: '/role'
+      path: '/role'
+      fullPath: '/role'
+      preLoaderRoute: typeof RoleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/student': {
+      id: '/student'
+      path: '/student'
+      fullPath: '/student'
+      preLoaderRoute: typeof StudentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/session/$practicalId': {
+      id: '/session/$practicalId'
+      path: '/session/$practicalId'
+      fullPath: '/session/$practicalId'
+      preLoaderRoute: typeof SessionPracticalIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  InstructorRoute: InstructorRoute,
+  RoleRoute: RoleRoute,
+  StudentRoute: StudentRoute,
+  SessionPracticalIdRoute: SessionPracticalIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
