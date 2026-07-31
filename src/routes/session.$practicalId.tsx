@@ -394,7 +394,10 @@ function StudentStudio({ practical }: { practical: Practical }) {
             label={myGroup ? `Breakout: ${myGroup}` : "No breakout group"}
             active={!!myGroup}
             onClick={() => {
-              if (!myGroup) return toast.info("Your instructor has not created breakout groups yet");
+              if (!myGroup) {
+                toast.info("Your instructor has not created breakout groups yet");
+                return;
+              }
               setChannel(channel === "main" ? myGroup : "main");
               toast.success(
                 channel === "main" ? `Joined ${myGroup} channel` : "Returned to main session",
