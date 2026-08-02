@@ -93,20 +93,35 @@ function Landing() {
 
       <main>
         <section className="mx-auto max-w-[1320px] px-6 pt-8">
-          <div className="overflow-hidden rounded-[32px] bg-[#eceff3]">
-            <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
+          <div className="relative overflow-hidden rounded-[32px] bg-[#eceff3]">
+            <span
+              aria-hidden
+              className="pointer-events-none absolute -top-24 -left-24 size-[420px] rounded-full bg-primary/10 blur-3xl motion-safe:animate-[pulse_9s_cubic-bezier(0.4,0,0.6,1)_infinite]"
+            />
+            <span
+              aria-hidden
+              className="pointer-events-none absolute -bottom-32 left-1/3 size-[360px] rounded-full bg-secondary/10 blur-3xl motion-safe:animate-[pulse_12s_cubic-bezier(0.4,0,0.6,1)_infinite]"
+            />
+            <div className="relative grid items-center gap-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
               <div className="px-8 py-14 md:px-14 md:py-20">
-                <span className="grid size-12 place-items-center rounded-[16px] bg-foreground">
+                <span className="grid size-12 place-items-center rounded-[16px] bg-foreground motion-safe:animate-scale-in">
                   <span className="block size-5 rounded-full border-[3px] border-primary-foreground" />
                 </span>
-                <h1 className="mt-8 text-[40px] leading-[1.05] font-bold tracking-[-0.02em] text-foreground md:text-h1 lg:text-display">
-                  A virtual laboratory built for instructor-led practical classes
+                <h1 className="mt-8 text-[40px] leading-[1.05] font-bold tracking-[-0.02em] text-foreground motion-safe:animate-fade-in md:text-h1 lg:text-display">
+                  The virtual laboratory where practical classes actually happen
                 </h1>
-                <p className="measure mt-6 text-bodylg text-muted-foreground">
-                  Conduct live laboratory sessions, run interactive simulations, supervise every
-                  workstation and assess practical competence without leaving the studio.
+                <p
+                  className="measure mt-6 text-bodylg text-muted-foreground motion-safe:animate-fade-in"
+                  style={{ animationDelay: "120ms", animationFillMode: "backwards" }}
+                >
+                  Teach live, demonstrate on screen, hand every student a working workstation and
+                  assess what they did — in one platform instead of four. Think of a meeting tool
+                  designed for laboratories rather than boardrooms.
                 </p>
-                <div className="mt-10 flex flex-wrap items-center gap-3">
+                <div
+                  className="mt-10 flex flex-wrap items-center gap-3 motion-safe:animate-fade-in"
+                  style={{ animationDelay: "220ms", animationFillMode: "backwards" }}
+                >
                   <BtnLink to="/role" size="lg">
                     Launch Lab <ArrowRight className="size-4" strokeWidth={2} />
                   </BtnLink>
@@ -115,10 +130,10 @@ function Landing() {
                   </BtnLink>
                 </div>
               </div>
-              <div className="relative h-full">
+              <div className="relative h-full motion-safe:animate-fade-in">
                 <img
                   src={heroImage}
-                  alt="Virtual laboratory workstation, live session grid and progress dashboard on three screens"
+                  alt="Virtual laboratory workstation, live session grid and progress dashboard shown on three floating screens"
                   width={1600}
                   height={1104}
                   className="h-full w-full object-cover"
@@ -131,15 +146,15 @@ function Landing() {
         <section className="mx-auto mt-6 max-w-[1320px] px-6">
           <div className="flex flex-col gap-6 rounded-[24px] bg-foreground px-8 py-7 text-primary-foreground md:flex-row md:items-center md:justify-between md:px-12">
             <p className="measure text-[17px]">
-              <span className="font-semibold">4,800 practical hours</span>
+              <span className="font-semibold">Built for departments that share equipment</span>
               <span className="text-white/60">
                 {" "}
-                delivered across departments that share limited laboratory equipment
+                — laboratory capacity stops being the limit on how much students practise
               </span>
             </p>
             <div className="flex flex-wrap items-center gap-x-8 gap-y-3 text-[15px] font-medium text-white/55">
               {[
-                "Faculty of Computing",
+                "Computing",
                 "Engineering",
                 "Physical Sciences",
                 "Education",
@@ -150,6 +165,7 @@ function Landing() {
             </div>
           </div>
         </section>
+
 
         <section className="mx-auto mt-28 max-w-[1320px] px-6">
           <div className="grid items-start gap-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
@@ -182,7 +198,7 @@ function Landing() {
             <Panel className="overflow-hidden p-3">
               <div className="mb-3 flex items-center justify-between px-3 pt-2">
                 <span className="flex items-center gap-2 text-caption text-muted-foreground">
-                  <Dot /> IFT 212 · Workstation-14 · live
+                  <Dot /> Virtual workstation · live preview
                 </span>
                 <Tag tone="primary">Interactive preview</Tag>
               </div>
@@ -246,9 +262,10 @@ function Landing() {
               Laboratory access no longer ends at the campus gate
             </h2>
             <p className="mx-auto mt-5 max-w-[620px] text-bodylg text-muted-foreground">
-              Select a role to enter the platform with the 2025/2026 IFT 212 laboratory schedule
-              already prepared.
+              Create your profile in a minute, then schedule or join your first practical. The
+              platform starts empty and fills with your own courses, sessions and results.
             </p>
+
             <div className="mt-10 flex flex-wrap justify-center gap-3">
               <BtnLink to="/role" size="lg">
                 Launch Lab <ArrowRight className="size-4" strokeWidth={2} />

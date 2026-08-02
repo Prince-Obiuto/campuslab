@@ -30,7 +30,7 @@ import { cn } from "@/lib/utils";
 import { Avatar, Btn, Dot, Meter, Tag } from "@/components/kit";
 import { WinSim } from "@/components/lab/win-sim";
 import { RoleToggle } from "@/components/workspace-chrome";
-import { course, instructor, student as me, useCampus, type Practical } from "@/lib/campus";
+import { useCampus, type Practical } from "@/lib/campus";
 
 export const Route = createFileRoute("/session/$practicalId")({
   head: () => ({
@@ -101,7 +101,7 @@ function SessionShell({
               {practical.title}
             </p>
             <p className="truncate text-[13px] text-muted-foreground">
-              {course.code} · {practical.venue} · {practical.focus}
+              {[practical.code, practical.venue, practical.focus].filter(Boolean).join(" · ")}
             </p>
           </div>
         </div>
@@ -197,7 +197,7 @@ function Tabs({
 }
 
 function ChatPanel({ channel }: { channel: string }) {
-  const { chat, sendChat, role } = useCampus();
+  const { chat, sendChat, role, profiles } = useCampus();
   const [draft, setDraft] = useState("");
   const box = useRef<HTMLDivElement>(null);
   const messages = chat.filter((m) => m.channel === channel);
@@ -226,7 +226,7 @@ function ChatPanel({ channel }: { channel: string }) {
           if (!draft.trim()) return;
           sendChat(
             draft,
-            role === "instructor" ? instructor.name : me.name,
+            (role === "instructor" ? profiles.instructor?.name : profiles.student?.name) ?? "You",
             role ?? "student",
             channel,
           );
@@ -330,6 +330,7 @@ function StudentStudio({ practical }: { practical: Practical }) {
     myGroup,
     groups,
     sharing,
+    profiles,
   } = useCampus();
   const [tab, setTab] = useState("participants");
   const [view, setView] = useState<"mine" | "shared">("mine");
@@ -423,7 +424,7 @@ function StudentStudio({ practical }: { practical: Practical }) {
               <div className="mb-4 overflow-hidden rounded-[12px] bg-foreground">
                 <div className="flex aspect-video items-end justify-between bg-[radial-gradient(120%_120%_at_20%_0%,#1e3a8a_0%,#0b1220_100%)] p-3">
                   <span className="rounded-full bg-black/40 px-2.5 py-1 text-[12px] text-white/85">
-                    {instructor.name} · presenting
+                    {profiles.instructor?.name ?? "Instructor"} · presenting
                   </span>
                   <Mic className="size-4 text-white/85" strokeWidth={1.8} />
                 </div>

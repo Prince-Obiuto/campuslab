@@ -11,9 +11,10 @@ import {
 } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { toast } from "sonner";
-import { WorkspaceHeader } from "@/components/workspace-chrome";
+import { Empty, ProfileGate, WorkspaceHeader } from "@/components/workspace-chrome";
 import { Avatar, Btn, Dot, Meter, Panel, Tag } from "@/components/kit";
-import { course, instructor, useCampus, type Resource } from "@/lib/campus";
+import { useCampus, type Resource } from "@/lib/campus";
+
 
 export const Route = createFileRoute("/instructor")({
   head: () => ({
@@ -34,25 +35,31 @@ export const Route = createFileRoute("/instructor")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: InstructorDashboard,
+  component: () => (
+    <ProfileGate role="instructor">
+      <InstructorDashboard />
+    </ProfileGate>
+  ),
 });
 
 const kinds: Resource["kind"][] = ["Manual", "Slides", "Dataset", "Checklist"];
 
 function InstructorDashboard() {
-  const { practicals, students, schedulePractical, addResource, setStatus, gradeStudent } =
+  const { practicals, students, schedulePractical, addResource, setStatus, gradeStudent, profiles } =
     useCampus();
   const navigate = useNavigate();
+  const me = profiles.instructor!;
 
   const [form, setForm] = useState({
     title: "",
     focus: "Task Manager, Disk Cleanup",
-    date: "Fri, 21 Aug",
+    date: "",
     time: "10:00",
     duration: "90 min",
     venue: "Virtual Lab Studio A",
     weight: 15,
   });
+
   const [upload, setUpload] = useState({
     practicalId: practicals[0]?.id ?? "",
     title: "",
@@ -76,12 +83,14 @@ function InstructorDashboard() {
       <main className="mx-auto max-w-[1320px] px-6 pb-24">
         <section className="pt-12">
           <h1 className="text-h3 font-bold tracking-[-0.015em] md:text-h2">
-            {instructor.name.split(" ").slice(-1)[0]}, your laboratory is ready
+            {me.name.split(" ").slice(-1)[0]}, your laboratory is ready
           </h1>
           <p className="measure mt-3 text-bodylg text-muted-foreground">
-            {roster.length} students registered for {course.code} · {practicals.length} practicals in
-            the semester plan.
+            {practicals.length === 0
+              ? "Schedule your first practical below. Students see it instantly, register themselves, and a supervised workstation is provisioned for each of them."
+              : `${roster.length} students registered · ${practicals.length} practicals in your plan.`}
           </p>
+
         </section>
 
         {live && (
@@ -130,7 +139,16 @@ function InstructorDashboard() {
                 <span>Progress</span>
                 <span className="text-right">Score</span>
               </div>
+              {roster.length === 0 && (
+                <div className="p-5">
+                  <Empty
+                    title="No students registered yet"
+                    body="Publish a practical and every student who registers appears here with live progress and a grading control."
+                  />
+                </div>
+              )}
               {roster.map((s) => (
+
                 <div
                   key={s.id}
                   className="grid grid-cols-[minmax(0,1.6fr)_120px_minmax(0,1fr)_92px] items-center gap-3 border-b border-border px-5 py-3.5 last:border-0"
@@ -173,20 +191,18 @@ function InstructorDashboard() {
             <Panel className="p-8">
               <p className="text-bodylg font-semibold tracking-[-0.01em]">Instructor profile</p>
               <div className="mt-5 flex items-center gap-3 border-t border-border pt-4">
-                <Avatar name={instructor.name} className="size-12 text-[16px]" />
+                <Avatar name={me.name} className="size-12 text-[16px]" />
                 <span>
-                  <span className="block text-[16px] font-medium">{instructor.name}</span>
-                  <span className="block text-caption text-muted-foreground">
-                    {instructor.title}
-                  </span>
+                  <span className="block text-[16px] font-medium">{me.name}</span>
+                  <span className="block text-caption text-muted-foreground">{me.standing}</span>
                 </span>
               </div>
               <dl className="mt-5 space-y-3 text-[15px]">
                 {[
-                  ["Staff ID", instructor.staffId],
-                  ["Department", instructor.department],
-                  ["Course", instructor.courses[0] ?? course.title],
-                  ["Office", instructor.office],
+                  ["Staff ID", me.identifier],
+                  ["Department", me.unit],
+                  ["Course", me.course],
+
                 ].map(([k, v]) => (
                   <div key={k} className="border-t border-border pt-3">
                     <dt className="text-caption text-muted-foreground">{k}</dt>
@@ -373,7 +389,7 @@ function InstructorDashboard() {
                     <input
                       value={upload.title}
                       onChange={(e) => setUpload({ ...upload, title: e.target.value })}
-                      placeholder="IFT 212 Lab Manual — Practical 7"
+                      placeholder="Laboratory manual — Practical 1"
                       className={inputClass}
                     />
                   </Field>

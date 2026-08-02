@@ -78,9 +78,10 @@ export function SiteFooter() {
           </div>
         </div>
         <div className="mt-12 flex flex-col gap-2 border-t border-white/12 pt-6 text-caption text-white/50 md:flex-row md:justify-between">
-          <span>© 2026 CampusLab. Faculty of Computing deployment.</span>
-          <span>IFT 212 — Computer Architecture and Organization</span>
+          <span>© 2026 CampusLab. Virtual laboratory platform for higher institutions.</span>
+          <span>Live sessions · Simulations · Assessment · Competency records</span>
         </div>
+
       </div>
     </footer>
   );
