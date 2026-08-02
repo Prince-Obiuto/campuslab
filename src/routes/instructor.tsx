@@ -35,25 +35,31 @@ export const Route = createFileRoute("/instructor")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: InstructorDashboard,
+  component: () => (
+    <ProfileGate role="instructor">
+      <InstructorDashboard />
+    </ProfileGate>
+  ),
 });
 
 const kinds: Resource["kind"][] = ["Manual", "Slides", "Dataset", "Checklist"];
 
 function InstructorDashboard() {
-  const { practicals, students, schedulePractical, addResource, setStatus, gradeStudent } =
+  const { practicals, students, schedulePractical, addResource, setStatus, gradeStudent, profiles } =
     useCampus();
   const navigate = useNavigate();
+  const me = profiles.instructor!;
 
   const [form, setForm] = useState({
     title: "",
     focus: "Task Manager, Disk Cleanup",
-    date: "Fri, 21 Aug",
+    date: "",
     time: "10:00",
     duration: "90 min",
     venue: "Virtual Lab Studio A",
     weight: 15,
   });
+
   const [upload, setUpload] = useState({
     practicalId: practicals[0]?.id ?? "",
     title: "",
