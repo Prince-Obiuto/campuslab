@@ -330,6 +330,7 @@ function StudentStudio({ practical }: { practical: Practical }) {
     myGroup,
     groups,
     sharing,
+    profiles,
   } = useCampus();
   const [tab, setTab] = useState("participants");
   const [view, setView] = useState<"mine" | "shared">("mine");
