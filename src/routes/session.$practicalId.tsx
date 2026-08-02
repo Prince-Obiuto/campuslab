@@ -197,7 +197,7 @@ function Tabs({
 }
 
 function ChatPanel({ channel }: { channel: string }) {
-  const { chat, sendChat, role } = useCampus();
+  const { chat, sendChat, role, profiles } = useCampus();
   const [draft, setDraft] = useState("");
   const box = useRef<HTMLDivElement>(null);
   const messages = chat.filter((m) => m.channel === channel);
