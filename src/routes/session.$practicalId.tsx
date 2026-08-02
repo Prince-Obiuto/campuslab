@@ -30,7 +30,7 @@ import { cn } from "@/lib/utils";
 import { Avatar, Btn, Dot, Meter, Tag } from "@/components/kit";
 import { WinSim } from "@/components/lab/win-sim";
 import { RoleToggle } from "@/components/workspace-chrome";
-import { course, instructor, student as me, useCampus, type Practical } from "@/lib/campus";
+import { useCampus, type Practical } from "@/lib/campus";
 
 export const Route = createFileRoute("/session/$practicalId")({
   head: () => ({
