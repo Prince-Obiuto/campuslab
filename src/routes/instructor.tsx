@@ -11,9 +11,10 @@ import {
 } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { toast } from "sonner";
-import { WorkspaceHeader } from "@/components/workspace-chrome";
+import { Empty, ProfileGate, WorkspaceHeader } from "@/components/workspace-chrome";
 import { Avatar, Btn, Dot, Meter, Panel, Tag } from "@/components/kit";
-import { course, instructor, useCampus, type Resource } from "@/lib/campus";
+import { useCampus, type Resource } from "@/lib/campus";
+
 
 export const Route = createFileRoute("/instructor")({
   head: () => ({
