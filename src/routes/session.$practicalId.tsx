@@ -424,7 +424,7 @@ function StudentStudio({ practical }: { practical: Practical }) {
               <div className="mb-4 overflow-hidden rounded-[12px] bg-foreground">
                 <div className="flex aspect-video items-end justify-between bg-[radial-gradient(120%_120%_at_20%_0%,#1e3a8a_0%,#0b1220_100%)] p-3">
                   <span className="rounded-full bg-black/40 px-2.5 py-1 text-[12px] text-white/85">
-                    {instructor.name} · presenting
+                    {profiles.instructor?.name ?? "Instructor"} · presenting
                   </span>
                   <Mic className="size-4 text-white/85" strokeWidth={1.8} />
                 </div>
