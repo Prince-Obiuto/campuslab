@@ -226,7 +226,7 @@ function ChatPanel({ channel }: { channel: string }) {
           if (!draft.trim()) return;
           sendChat(
             draft,
-            role === "instructor" ? instructor.name : me.name,
+            (role === "instructor" ? profiles.instructor?.name : profiles.student?.name) ?? "You",
             role ?? "student",
             channel,
           );
