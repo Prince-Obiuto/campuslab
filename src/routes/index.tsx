@@ -198,7 +198,7 @@ function Landing() {
             <Panel className="overflow-hidden p-3">
               <div className="mb-3 flex items-center justify-between px-3 pt-2">
                 <span className="flex items-center gap-2 text-caption text-muted-foreground">
-                  <Dot /> IFT 212 · Workstation-14 · live
+                  <Dot /> Virtual workstation · live preview
                 </span>
                 <Tag tone="primary">Interactive preview</Tag>
               </div>
