@@ -29,11 +29,11 @@ export const Route = createFileRoute("/")({
         content:
           "CampusLab unites live instructor-led sessions, interactive laboratory simulations and continuous practical assessment in one virtual laboratory studio.",
       },
-      { property: "og:title", content: "CampusLab — Instructor-Led Virtual Laboratory" },
+      { property: "og:title", content: "CampusLab — Instructor-Led Virtual Laboratory for Universities" },
       {
         property: "og:description",
         content:
-          "Live laboratory sessions, hands-on simulations and competency assessment in a single virtual laboratory platform for higher institutions.",
+          "CampusLab unites live instructor-led sessions, interactive laboratory simulations and continuous practical assessment in one virtual laboratory studio.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

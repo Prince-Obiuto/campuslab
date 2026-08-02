@@ -79,14 +79,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "CampusLab — Instructor-Led Virtual Laboratory" },
-      { name: "description", content: "An instructor-led virtual laboratory platform for university practical courses." },
+      { title: "CampusLab — Instructor-Led Virtual Laboratory for Universities" },
+      { name: "description", content: "CampusLab unites live instructor-led sessions, interactive laboratory simulations and continuous practical assessment in one virtual laboratory studio." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "CampusLab — Instructor-Led Virtual Laboratory" },
-      { property: "og:description", content: "Live laboratory sessions, interactive simulations and continuous practical assessment." },
+      { property: "og:title", content: "CampusLab — Instructor-Led Virtual Laboratory for Universities" },
+      { property: "og:description", content: "CampusLab unites live instructor-led sessions, interactive laboratory simulations and continuous practical assessment in one virtual laboratory studio." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "CampusLab — Instructor-Led Virtual Laboratory for Universities" },
+      { name: "twitter:description", content: "CampusLab unites live instructor-led sessions, interactive laboratory simulations and continuous practical assessment in one virtual laboratory studio." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/1868d82d-1ae5-46b9-9650-8abb61663855/id-preview-aa8af38f--13b9731a-54f5-4236-8f98-dedfef5ee94c.lovable.app-1785711021612.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/1868d82d-1ae5-46b9-9650-8abb61663855/id-preview-aa8af38f--13b9731a-54f5-4236-8f98-dedfef5ee94c.lovable.app-1785711021612.png" },
     ],
     links: [
       {
