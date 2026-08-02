@@ -139,7 +139,16 @@ function InstructorDashboard() {
                 <span>Progress</span>
                 <span className="text-right">Score</span>
               </div>
+              {roster.length === 0 && (
+                <div className="p-5">
+                  <Empty
+                    title="No students registered yet"
+                    body="Publish a practical and every student who registers appears here with live progress and a grading control."
+                  />
+                </div>
+              )}
               {roster.map((s) => (
+
                 <div
                   key={s.id}
                   className="grid grid-cols-[minmax(0,1.6fr)_120px_minmax(0,1fr)_92px] items-center gap-3 border-b border-border px-5 py-3.5 last:border-0"
