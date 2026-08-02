@@ -83,12 +83,14 @@ function InstructorDashboard() {
       <main className="mx-auto max-w-[1320px] px-6 pb-24">
         <section className="pt-12">
           <h1 className="text-h3 font-bold tracking-[-0.015em] md:text-h2">
-            {instructor.name.split(" ").slice(-1)[0]}, your laboratory is ready
+            {me.name.split(" ").slice(-1)[0]}, your laboratory is ready
           </h1>
           <p className="measure mt-3 text-bodylg text-muted-foreground">
-            {roster.length} students registered for {course.code} · {practicals.length} practicals in
-            the semester plan.
+            {practicals.length === 0
+              ? "Schedule your first practical below. Students see it instantly, register themselves, and a supervised workstation is provisioned for each of them."
+              : `${roster.length} students registered · ${practicals.length} practicals in your plan.`}
           </p>
+
         </section>
 
         {live && (
