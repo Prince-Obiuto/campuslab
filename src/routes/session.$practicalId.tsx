@@ -101,7 +101,7 @@ function SessionShell({
               {practical.title}
             </p>
             <p className="truncate text-[13px] text-muted-foreground">
-              {course.code} · {practical.venue} · {practical.focus}
+              {[practical.code, practical.venue, practical.focus].filter(Boolean).join(" · ")}
             </p>
           </div>
         </div>
