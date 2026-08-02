@@ -182,20 +182,18 @@ function InstructorDashboard() {
             <Panel className="p-8">
               <p className="text-bodylg font-semibold tracking-[-0.01em]">Instructor profile</p>
               <div className="mt-5 flex items-center gap-3 border-t border-border pt-4">
-                <Avatar name={instructor.name} className="size-12 text-[16px]" />
+                <Avatar name={me.name} className="size-12 text-[16px]" />
                 <span>
-                  <span className="block text-[16px] font-medium">{instructor.name}</span>
-                  <span className="block text-caption text-muted-foreground">
-                    {instructor.title}
-                  </span>
+                  <span className="block text-[16px] font-medium">{me.name}</span>
+                  <span className="block text-caption text-muted-foreground">{me.standing}</span>
                 </span>
               </div>
               <dl className="mt-5 space-y-3 text-[15px]">
                 {[
-                  ["Staff ID", instructor.staffId],
-                  ["Department", instructor.department],
-                  ["Course", instructor.courses[0] ?? course.title],
-                  ["Office", instructor.office],
+                  ["Staff ID", me.identifier],
+                  ["Department", me.unit],
+                  ["Course", me.course],
+
                 ].map(([k, v]) => (
                   <div key={k} className="border-t border-border pt-3">
                     <dt className="text-caption text-muted-foreground">{k}</dt>
