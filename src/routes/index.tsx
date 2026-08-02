@@ -262,9 +262,10 @@ function Landing() {
               Laboratory access no longer ends at the campus gate
             </h2>
             <p className="mx-auto mt-5 max-w-[620px] text-bodylg text-muted-foreground">
-              Select a role to enter the platform with the 2025/2026 IFT 212 laboratory schedule
-              already prepared.
+              Create your profile in a minute, then schedule or join your first practical. The
+              platform starts empty and fills with your own courses, sessions and results.
             </p>
+
             <div className="mt-10 flex flex-wrap justify-center gap-3">
               <BtnLink to="/role" size="lg">
                 Launch Lab <ArrowRight className="size-4" strokeWidth={2} />
