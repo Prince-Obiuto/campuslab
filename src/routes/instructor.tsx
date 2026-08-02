@@ -389,7 +389,7 @@ function InstructorDashboard() {
                     <input
                       value={upload.title}
                       onChange={(e) => setUpload({ ...upload, title: e.target.value })}
-                      placeholder="IFT 212 Lab Manual — Practical 7"
+                      placeholder="Laboratory manual — Practical 1"
                       className={inputClass}
                     />
                   </Field>
