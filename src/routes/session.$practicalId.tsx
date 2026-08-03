@@ -67,15 +67,120 @@ function useTimer() {
 
 function SessionRoute() {
   const { practicalId } = Route.useParams();
-  const { practicals, role } = useCampus();
+  const { practicals, role, connection, joinedPracticalId } = useCampus();
   const practical = practicals.find((p) => p.id === practicalId) ?? practicals[0];
   if (!practical) return null;
+  const connected = connection === "live" && joinedPracticalId === practical.id;
+  if (!connected) return <StudioLobby practical={practical} />;
   return role === "instructor" ? (
     <InstructorConsole practical={practical} />
   ) : (
     <StudentStudio practical={practical} />
   );
 }
+
+/* -------------------------------- lobby -------------------------------- */
+
+function StudioLobby({ practical }: { practical: Practical }) {
+  const navigate = useNavigate();
+  const { role, profile, connection, joinSession, devices, setDevice, students, setStatus } =
+    useCampus();
+  const connecting = connection === "connecting";
+  const isInstructor = role === "instructor";
+
+  return (
+    <div className="grid min-h-screen place-items-center bg-background px-6 py-16">
+      <div className="w-full max-w-[880px]">
+        <button
+          onClick={() => navigate({ to: isInstructor ? "/instructor" : "/student" })}
+          className="text-[14px] text-muted-foreground transition-colors hover:text-foreground"
+        >
+          ← Back to dashboard
+        </button>
+        <div className="mt-6 grid gap-6 md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+          <div className="rounded-[20px] border border-border bg-surface p-8">
+            <Tag tone={practical.status === "live" ? "error" : "neutral"}>
+              <Dot tone={practical.status === "live" ? "error" : "neutral"} />
+              {practical.status === "live" ? "Session in progress" : "Studio not yet open"}
+            </Tag>
+            <h1 className="mt-5 text-h3 font-bold tracking-[-0.01em]">{practical.title}</h1>
+            <p className="mt-2 text-[16px] text-muted-foreground">
+              {[practical.focus, practical.venue, practical.date, practical.time]
+                .filter(Boolean)
+                .join(" · ")}
+            </p>
+            <dl className="mt-6 space-y-3 text-[15px]">
+              {[
+                ["Joining as", `${profile?.name ?? "Guest"} · ${isInstructor ? "instructor" : "student"}`],
+                ["Workstation", isInstructor ? "Supervisor console" : "Provisioned on connect"],
+                ["Participants online", String(students.filter((s) => s.present).length)],
+              ].map(([k, v]) => (
+                <div key={k} className="border-t border-border pt-3">
+                  <dt className="text-caption text-muted-foreground">{k}</dt>
+                  <dd className="mt-0.5">{v}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+
+          <div className="flex flex-col rounded-[20px] border border-border bg-surface p-8">
+            <p className="text-bodylg font-semibold tracking-[-0.01em]">Check your devices</p>
+            <p className="mt-1 text-caption text-muted-foreground">
+              You can change these at any time once you are inside the studio.
+            </p>
+            <div className="mt-6 flex flex-col gap-2">
+              <CtrlBtn
+                icon={devices.mic ? Mic : MicOff}
+                label={devices.mic ? "Microphone on" : "Microphone off"}
+                active={devices.mic}
+                tone="primary"
+                onClick={() => setDevice("mic", !devices.mic)}
+              />
+              <CtrlBtn
+                icon={devices.cam ? Video : VideoOff}
+                label={devices.cam ? "Camera on" : "Camera off"}
+                active={devices.cam}
+                tone="primary"
+                onClick={() => setDevice("cam", !devices.cam)}
+              />
+            </div>
+            <div className="mt-auto pt-8">
+              <Btn
+                size="lg"
+                className="w-full"
+                disabled={connecting}
+                onClick={() => {
+                  if (isInstructor && practical.status !== "live") setStatus(practical.id, "live");
+                  joinSession(practical.id);
+                  toast.success(
+                    isInstructor ? "Opening the studio" : "Connecting to the live studio",
+                  );
+                }}
+              >
+                {connecting ? (
+                  <>
+                    <Radio className="size-4 animate-pulse" strokeWidth={2} /> Connecting…
+                  </>
+                ) : (
+                  <>
+                    <Radio className="size-4" strokeWidth={2} />
+                    {isInstructor ? "Open the studio" : "Connect to studio"}
+                  </>
+                )}
+              </Btn>
+              <p className="mt-3 text-center text-[13px] text-muted-foreground">
+                {connecting
+                  ? "Negotiating media and provisioning your workstation…"
+                  : "Real-time audio, screen share and your virtual workstation start together."}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
 function SessionShell({
   practical,
