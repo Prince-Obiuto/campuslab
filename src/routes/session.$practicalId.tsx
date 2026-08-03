@@ -445,13 +445,15 @@ function StudentStudio({ practical }: { practical: Practical }) {
     groups,
     sharing,
     profiles,
+    devices,
+    setDevice,
   } = useCampus();
   const [tab, setTab] = useState("participants");
   const [view, setView] = useState<"mine" | "shared">("mine");
-  const [mic, setMic] = useState(false);
-  const [cam, setCam] = useState(true);
   const [screen, setScreen] = useState(false);
   const [channel, setChannel] = useState("main");
+  const mic = devices.mic;
+  const cam = devices.cam;
 
   const tasks = practical.tasks;
   const progress = Math.round((completedTasks.length / Math.max(1, tasks.length)) * 100);
@@ -475,15 +477,16 @@ function StudentStudio({ practical }: { practical: Practical }) {
             label={mic ? "Microphone on" : "Microphone off"}
             active={!mic}
             tone="danger"
-            onClick={() => setMic((v) => !v)}
+            onClick={() => setDevice("mic", !mic)}
           />
           <CtrlBtn
             icon={cam ? Video : VideoOff}
             label={cam ? "Camera on" : "Camera off"}
             active={!cam}
             tone="danger"
-            onClick={() => setCam((v) => !v)}
+            onClick={() => setDevice("cam", !cam)}
           />
+
           <CtrlBtn
             icon={Hand}
             label={handRaised ? "Hand raised" : "Raise hand"}
