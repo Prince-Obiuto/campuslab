@@ -263,10 +263,9 @@ function Landing() {
             </p>
 
             <div className="mt-10 flex flex-wrap justify-center gap-3">
-              <BtnLink to="/role" size="lg">
-                Launch Lab <ArrowRight className="size-4" strokeWidth={2} />
-              </BtnLink>
+              <StartCta />
             </div>
+
           </div>
         </section>
       </main>
