@@ -157,6 +157,8 @@ const STORE_KEY = "campuslab.profiles.v1";
 
 type Profiles = { student: Profile | null; instructor: Profile | null };
 
+export type Connection = "offline" | "connecting" | "live";
+
 type State = {
   role: Role | null;
   profiles: Profiles;
@@ -172,7 +174,12 @@ type State = {
   completedTasks: string[];
   myGroup: string | null;
   groups: { name: string; members: string[] }[];
+  /** Real-time studio connection for the session you are currently in. */
+  connection: Connection;
+  joinedPracticalId: string | null;
+  devices: { mic: boolean; cam: boolean };
 };
+
 
 type Actions = {
   setRole: (r: Role | null) => void;
