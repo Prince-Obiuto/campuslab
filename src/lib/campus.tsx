@@ -289,9 +289,30 @@ export function CampusProvider({ children }: { children: ReactNode }) {
       completedTasks,
       groups,
       myGroup,
+      connection,
+      joinedPracticalId,
+      devices,
       setRole,
       setSharing,
       setPaused,
+      setDevice: (device, on) => setDevices((d) => ({ ...d, [device]: on })),
+      joinSession: (practicalId) => {
+        setJoinedPracticalId(practicalId);
+        setConnection("connecting");
+      },
+      leaveSession: () => {
+        setConnection("offline");
+        setJoinedPracticalId(null);
+        setHandRaised(false);
+        setStudents((list) =>
+          list.map((s) =>
+            s.id === "me"
+              ? { ...s, present: false, handRaised: false, activity: "Not in session" }
+              : s,
+          ),
+        );
+      },
+
       createProfile: (p) => {
         persist({ ...profiles, [p.role]: p });
         if (p.role === "student") {
