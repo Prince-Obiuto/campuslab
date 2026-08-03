@@ -209,6 +209,11 @@ type Actions = {
   setSharing: (v: boolean) => void;
   setPaused: (v: boolean) => void;
   toggleTask: (taskId: string) => void;
+  /** Start the handshake with the live studio for a practical. */
+  joinSession: (practicalId: string) => void;
+  /** Disconnect from the studio and release the workstation. */
+  leaveSession: () => void;
+  setDevice: (device: "mic" | "cam", on: boolean) => void;
 };
 
 const Ctx = createContext<(State & Actions) | null>(null);
@@ -226,6 +231,22 @@ export function CampusProvider({ children }: { children: ReactNode }) {
   const [completedTasks, setCompletedTasks] = useState<string[]>([]);
   const [groups, setGroups] = useState<{ name: string; members: string[] }[]>([]);
   const [myGroup, setMyGroup] = useState<string | null>(null);
+  const [connection, setConnection] = useState<Connection>("offline");
+  const [joinedPracticalId, setJoinedPracticalId] = useState<string | null>(null);
+  const [devices, setDevices] = useState({ mic: false, cam: true });
+
+  // The studio handshake: negotiating media and workstation, then live.
+  useEffect(() => {
+    if (connection !== "connecting") return;
+    const t = setTimeout(() => {
+      setConnection("live");
+      setStudents((list) =>
+        list.map((s) => (s.id === "me" ? { ...s, present: true, activity: "In session" } : s)),
+      );
+    }, 1600);
+    return () => clearTimeout(t);
+  }, [connection]);
+
 
   // Profiles survive a refresh so the workspace keeps the identity you created.
   useEffect(() => {
