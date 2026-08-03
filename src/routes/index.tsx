@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   ArrowRight,
   Activity,
@@ -17,7 +17,8 @@ import {
 } from "lucide-react";
 import heroImage from "@/assets/hero-lab.jpg";
 import { SiteFooter, SiteNav } from "@/components/site-chrome";
-import { BtnLink, Panel, Tag, Dot } from "@/components/kit";
+import { Btn, BtnLink, Panel, Tag, Dot } from "@/components/kit";
+import { useCampus } from "@/lib/campus";
 import { WinSim } from "@/components/lab/win-sim";
 
 export const Route = createFileRoute("/")({
