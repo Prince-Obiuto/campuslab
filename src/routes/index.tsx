@@ -274,3 +274,46 @@ function Landing() {
     </div>
   );
 }
+
+/** Resolves the next step of the journey from whatever state the visitor is in. */
+function StartCta() {
+  const navigate = useNavigate();
+  const { profiles, role, practicals } = useCampus();
+  const active = role && profiles[role] ? role : profiles.student ? "student" : profiles.instructor ? "instructor" : null;
+  const live = practicals.find((p) => p.status === "live");
+
+  if (!active) {
+    return (
+      <>
+        <BtnLink to="/role" size="lg">
+          Launch Lab <ArrowRight className="size-4" strokeWidth={2} />
+        </BtnLink>
+        <BtnLink to="/role" size="lg" variant="secondary">
+          Enter as instructor
+        </BtnLink>
+      </>
+    );
+  }
+
+  const profile = profiles[active]!;
+  return (
+    <>
+      {live ? (
+        <Btn
+          size="lg"
+          onClick={() => navigate({ to: "/session/$practicalId", params: { practicalId: live.id } })}
+        >
+          <Dot tone="error" /> Join the live studio <ArrowRight className="size-4" strokeWidth={2} />
+        </Btn>
+      ) : (
+        <BtnLink to={active === "instructor" ? "/instructor" : "/student"} size="lg">
+          Continue as {profile.name.split(" ")[0]}{" "}
+          <ArrowRight className="size-4" strokeWidth={2} />
+        </BtnLink>
+      )}
+      <BtnLink to="/role" size="lg" variant="secondary">
+        Switch profile
+      </BtnLink>
+    </>
+  );
+}
