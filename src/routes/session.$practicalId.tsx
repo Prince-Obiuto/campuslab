@@ -194,7 +194,7 @@ function SessionShell({
 }) {
   const navigate = useNavigate();
   const timer = useTimer();
-  const { students } = useCampus();
+  const { students, role, leaveSession } = useCampus();
   return (
     <div className="flex h-screen flex-col bg-background">
       <header className="flex h-16 shrink-0 items-center justify-between gap-6 border-b border-border bg-surface px-6">
@@ -212,6 +212,9 @@ function SessionShell({
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-3">
+          <Tag tone="success" className="hidden sm:inline-flex">
+            <Dot tone="success" /> Studio connected
+          </Tag>
           <Tag tone="error">
             <Dot tone="error" /> {timer}
           </Tag>
@@ -224,13 +227,18 @@ function SessionShell({
           <Btn
             size="sm"
             variant="danger"
-            onClick={() => navigate({ to: "/" })}
+            onClick={() => {
+              leaveSession();
+              toast.success("You left the studio");
+              navigate({ to: role === "instructor" ? "/instructor" : "/student" });
+            }}
             title="Leave session"
           >
             <LogOut className="size-4" strokeWidth={2} /> Leave
           </Btn>
         </div>
       </header>
+
 
       <div className="min-h-0 flex-1">{children}</div>
 
