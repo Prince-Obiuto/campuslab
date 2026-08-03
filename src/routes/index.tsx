@@ -122,12 +122,8 @@ function Landing() {
                   className="mt-10 flex flex-wrap items-center gap-3 motion-safe:animate-fade-in"
                   style={{ animationDelay: "220ms", animationFillMode: "backwards" }}
                 >
-                  <BtnLink to="/role" size="lg">
-                    Launch Lab <ArrowRight className="size-4" strokeWidth={2} />
-                  </BtnLink>
-                  <BtnLink to="/role" size="lg" variant="secondary">
-                    Enter as instructor
-                  </BtnLink>
+                  <StartCta />
+
                 </div>
               </div>
               <div className="relative h-full motion-safe:animate-fade-in">
