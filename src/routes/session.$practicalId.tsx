@@ -100,9 +100,10 @@ function StudioLobby({ practical }: { practical: Practical }) {
         <div className="mt-6 grid gap-6 md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
           <div className="rounded-[20px] border border-border bg-surface p-8">
             <Tag tone={practical.status === "live" ? "error" : "neutral"}>
-              <Dot tone={practical.status === "live" ? "error" : "neutral"} />
+              <Dot tone={practical.status === "live" ? "error" : "muted"} />
               {practical.status === "live" ? "Session in progress" : "Studio not yet open"}
             </Tag>
+
             <h1 className="mt-5 text-h3 font-bold tracking-[-0.01em]">{practical.title}</h1>
             <p className="mt-2 text-[16px] text-muted-foreground">
               {[practical.focus, practical.venue, practical.date, practical.time]
