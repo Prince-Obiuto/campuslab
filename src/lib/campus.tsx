@@ -157,6 +157,8 @@ const STORE_KEY = "campuslab.profiles.v1";
 
 type Profiles = { student: Profile | null; instructor: Profile | null };
 
+export type Connection = "offline" | "connecting" | "live";
+
 type State = {
   role: Role | null;
   profiles: Profiles;
@@ -172,7 +174,12 @@ type State = {
   completedTasks: string[];
   myGroup: string | null;
   groups: { name: string; members: string[] }[];
+  /** Real-time studio connection for the session you are currently in. */
+  connection: Connection;
+  joinedPracticalId: string | null;
+  devices: { mic: boolean; cam: boolean };
 };
+
 
 type Actions = {
   setRole: (r: Role | null) => void;
@@ -202,6 +209,11 @@ type Actions = {
   setSharing: (v: boolean) => void;
   setPaused: (v: boolean) => void;
   toggleTask: (taskId: string) => void;
+  /** Start the handshake with the live studio for a practical. */
+  joinSession: (practicalId: string) => void;
+  /** Disconnect from the studio and release the workstation. */
+  leaveSession: () => void;
+  setDevice: (device: "mic" | "cam", on: boolean) => void;
 };
 
 const Ctx = createContext<(State & Actions) | null>(null);
@@ -219,6 +231,22 @@ export function CampusProvider({ children }: { children: ReactNode }) {
   const [completedTasks, setCompletedTasks] = useState<string[]>([]);
   const [groups, setGroups] = useState<{ name: string; members: string[] }[]>([]);
   const [myGroup, setMyGroup] = useState<string | null>(null);
+  const [connection, setConnection] = useState<Connection>("offline");
+  const [joinedPracticalId, setJoinedPracticalId] = useState<string | null>(null);
+  const [devices, setDevices] = useState({ mic: false, cam: true });
+
+  // The studio handshake: negotiating media and workstation, then live.
+  useEffect(() => {
+    if (connection !== "connecting") return;
+    const t = setTimeout(() => {
+      setConnection("live");
+      setStudents((list) =>
+        list.map((s) => (s.id === "me" ? { ...s, present: true, activity: "In session" } : s)),
+      );
+    }, 1600);
+    return () => clearTimeout(t);
+  }, [connection]);
+
 
   // Profiles survive a refresh so the workspace keeps the identity you created.
   useEffect(() => {
@@ -261,9 +289,30 @@ export function CampusProvider({ children }: { children: ReactNode }) {
       completedTasks,
       groups,
       myGroup,
+      connection,
+      joinedPracticalId,
+      devices,
       setRole,
       setSharing,
       setPaused,
+      setDevice: (device, on) => setDevices((d) => ({ ...d, [device]: on })),
+      joinSession: (practicalId) => {
+        setJoinedPracticalId(practicalId);
+        setConnection("connecting");
+      },
+      leaveSession: () => {
+        setConnection("offline");
+        setJoinedPracticalId(null);
+        setHandRaised(false);
+        setStudents((list) =>
+          list.map((s) =>
+            s.id === "me"
+              ? { ...s, present: false, handRaised: false, activity: "Not in session" }
+              : s,
+          ),
+        );
+      },
+
       createProfile: (p) => {
         persist({ ...profiles, [p.role]: p });
         if (p.role === "student") {
@@ -395,7 +444,11 @@ export function CampusProvider({ children }: { children: ReactNode }) {
       completedTasks,
       groups,
       myGroup,
+      connection,
+      joinedPracticalId,
+      devices,
       patch,
+
     ],
   );
 
