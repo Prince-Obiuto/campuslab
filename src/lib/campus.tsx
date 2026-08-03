@@ -444,7 +444,11 @@ export function CampusProvider({ children }: { children: ReactNode }) {
       completedTasks,
       groups,
       myGroup,
+      connection,
+      joinedPracticalId,
+      devices,
       patch,
+
     ],
   );
 
