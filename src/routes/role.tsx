@@ -93,7 +93,17 @@ function RoleSelect() {
   const c = copy[active];
   const existing = profiles[active];
 
-  const [form, setForm] = useState({ name: "", identifier: "", standing: "", unit: "", course: "" });
+  const [form, setForm] = useState({
+    name: "",
+    identifier: "",
+    email: "",
+    password: "",
+    standing: "",
+    unit: "",
+    course: "",
+  });
+  const [login, setLogin] = useState({ identifier: "", password: "" });
+
 
   const enter = (r: Role) => {
     setRole(r);
@@ -166,6 +176,7 @@ function RoleSelect() {
                 </div>
                 <dl className="mt-5 space-y-3 text-[15px]">
                   {[
+                    ["Institutional email", existing.email],
                     [c.unitLabel, existing.unit],
                     ["Course", existing.course],
                   ].map(([k, v]) => (
@@ -175,41 +186,101 @@ function RoleSelect() {
                     </div>
                   ))}
                 </dl>
-                <div className="mt-8 flex flex-wrap items-center gap-3">
-                  <Btn size="lg" onClick={() => enter(active)}>
-                    Enter workspace <ArrowRight className="size-4" strokeWidth={2} />
-                  </Btn>
-                  <Btn
-                    size="lg"
-                    variant="secondary"
-                    onClick={() => {
-                      deleteProfile(active);
-                      toast.success(`${c.title} profile removed`);
-                    }}
-                  >
-                    <Trash2 className="size-4" strokeWidth={1.8} /> Remove profile
-                  </Btn>
-                </div>
+                <form
+                  className="mt-7 space-y-4 border-t border-border pt-6"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const ok = signIn(active, login.identifier, login.password);
+                    if (!ok) {
+                      toast.error("Sign in failed", {
+                        description:
+                          "The email or identifier and password do not match this profile.",
+                      });
+                      return;
+                    }
+                    setLogin({ identifier: "", password: "" });
+                    toast.success(`Welcome back, ${existing.name}`);
+                    navigate({ to: c.to });
+                  }}
+                >
+                  <p className="text-caption text-muted-foreground">
+                    Sign in with the credentials you registered
+                  </p>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Field label={`Email or ${c.idLabel.toLowerCase()}`}>
+                      <input
+                        required
+                        value={login.identifier}
+                        onChange={(e) => setLogin({ ...login, identifier: e.target.value })}
+                        placeholder={existing.email || c.idHint}
+                        className={inputClass}
+                      />
+                    </Field>
+                    <Field label="Password">
+                      <input
+                        required
+                        type="password"
+                        value={login.password}
+                        onChange={(e) => setLogin({ ...login, password: e.target.value })}
+                        placeholder="••••••••"
+                        className={inputClass}
+                      />
+                    </Field>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-3 pt-1">
+                    <Btn size="lg" type="submit">
+                      Sign in <ArrowRight className="size-4" strokeWidth={2} />
+                    </Btn>
+                    <Btn
+                      size="lg"
+                      variant="secondary"
+                      type="button"
+                      onClick={() => {
+                        deleteProfile(active);
+                        toast.success(`${c.title} profile removed`);
+                      }}
+                    >
+                      <Trash2 className="size-4" strokeWidth={1.8} /> Remove profile
+                    </Btn>
+                  </div>
+                </form>
               </div>
             ) : (
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
                   if (!form.name.trim() || !form.identifier.trim()) return;
+                  if (form.password.trim().length < 6) {
+                    toast.error("Password too short", {
+                      description: "Use at least six characters so sign in stays meaningful.",
+                    });
+                    return;
+                  }
                   const profile: Profile = {
                     role: active,
                     name: form.name.trim(),
                     identifier: form.identifier.trim(),
+                    email: form.email.trim(),
+                    password: form.password,
                     standing: form.standing.trim(),
                     unit: form.unit.trim(),
                     course: form.course.trim(),
                   };
                   createProfile(profile);
                   toast.success(`${c.title} profile created`, { description: profile.name });
-                  setForm({ name: "", identifier: "", standing: "", unit: "", course: "" });
+                  setForm({
+                    name: "",
+                    identifier: "",
+                    email: "",
+                    password: "",
+                    standing: "",
+                    unit: "",
+                    course: "",
+                  });
                   enter(active);
                 }}
               >
+
                 <p className="text-bodylg font-semibold tracking-[-0.01em]">
                   Create your {c.title.toLowerCase()} profile
                 </p>

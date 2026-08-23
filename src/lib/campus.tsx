@@ -70,15 +70,53 @@ export type ChatMessage = {
 
 export type Announcement = { id: string; body: string; at: string };
 
+/** Performance_Log entity (Table 4.1) — one record per submitted experiment. */
+export type PerformanceLog = {
+  id: string;
+  studentId: string;
+  studentName: string;
+  practicalId: string;
+  practicalTitle: string;
+  tasksCompleted: number;
+  tasksTotal: number;
+  score: number;
+  completionTime: string;
+  at: string;
+};
+
+/** Feedback entity (Table 4.1) — post-session rating and comment. */
+export type Feedback = {
+  id: string;
+  practicalId: string;
+  author: string;
+  role: Role;
+  rating: number;
+  comment: string;
+  at: string;
+};
+
+/** System notification (Section 4.5) — session status changes and instructor messages. */
+export type Notice = {
+  id: string;
+  body: string;
+  kind: "session" | "assessment" | "message";
+  at: string;
+};
+
 export type Profile = {
   role: Role;
   name: string;
   identifier: string;
+  /** Institutional email used by the login form (Section 4.4). */
+  email: string;
+  /** Stored locally only — this prototype authenticates on the device. */
+  password: string;
   /** Level for a student, academic title for an instructor. */
   standing: string;
   unit: string;
   course: string;
 };
+
 
 const initials = (name: string) =>
   name
@@ -178,6 +216,14 @@ type State = {
   connection: Connection;
   joinedPracticalId: string | null;
   devices: { mic: boolean; cam: boolean };
+  /** Performance_Log records produced by submitted experiments. */
+  performanceLogs: PerformanceLog[];
+  /** Post-session feedback from students and instructors. */
+  feedback: Feedback[];
+  /** System notifications raised by session status changes. */
+  notices: Notice[];
+  /** Set when a session has ended and feedback has not yet been given. */
+  feedbackDue: string | null;
 };
 
 
@@ -185,6 +231,8 @@ type Actions = {
   setRole: (r: Role | null) => void;
   createProfile: (p: Profile) => void;
   deleteProfile: (r: Role) => void;
+  /** Login handler (TC-01 / TC-02): matches email or identifier plus password. */
+  signIn: (r: Role, identifier: string, password: string) => boolean;
   register: (id: string) => void;
   addResource: (practicalId: string, r: Omit<Resource, "id" | "uploadedAt">) => void;
   schedulePractical: (p: {
@@ -214,7 +262,20 @@ type Actions = {
   /** Disconnect from the studio and release the workstation. */
   leaveSession: () => void;
   setDevice: (device: "mic" | "cam", on: boolean) => void;
+  /** Assessment Module: records a submission and returns the missing steps, if any. */
+  submitPractical: (
+    practicalId: string,
+    elapsed: string,
+  ) => { ok: boolean; missing: LabTask[]; score: number };
+  /** Session Management Module: ends the session, disconnects everyone, saves results. */
+  endSession: (practicalId: string) => void;
+  /** Feedback Module: stores a rating and comment for a finished session. */
+  submitFeedback: (practicalId: string, rating: number, comment: string) => void;
+  dismissFeedback: () => void;
+  notify: (body: string, kind?: Notice["kind"]) => void;
+  clearNotices: () => void;
 };
+
 
 const Ctx = createContext<(State & Actions) | null>(null);
 
@@ -234,6 +295,11 @@ export function CampusProvider({ children }: { children: ReactNode }) {
   const [connection, setConnection] = useState<Connection>("offline");
   const [joinedPracticalId, setJoinedPracticalId] = useState<string | null>(null);
   const [devices, setDevices] = useState({ mic: false, cam: true });
+  const [performanceLogs, setPerformanceLogs] = useState<PerformanceLog[]>([]);
+  const [feedback, setFeedback] = useState<Feedback[]>([]);
+  const [notices, setNotices] = useState<Notice[]>([]);
+  const [feedbackDue, setFeedbackDue] = useState<string | null>(null);
+
 
   // The studio handshake: negotiating media and workstation, then live.
   useEffect(() => {
@@ -292,6 +358,101 @@ export function CampusProvider({ children }: { children: ReactNode }) {
       connection,
       joinedPracticalId,
       devices,
+      performanceLogs,
+      feedback,
+      notices,
+      feedbackDue,
+      notify: (body, kind = "session") =>
+        setNotices((list) => [{ id: rid(), body, kind, at: now() }, ...list].slice(0, 30)),
+      clearNotices: () => setNotices([]),
+      signIn: (r, identifier, password) => {
+        const p = profiles[r];
+        if (!p) return false;
+        const id = identifier.trim().toLowerCase();
+        const matches = id === p.email.toLowerCase() || id === p.identifier.toLowerCase();
+        if (!matches || password !== p.password) return false;
+        setRole(r);
+        return true;
+      },
+      submitPractical: (practicalId, elapsed) => {
+        const p = practicals.find((x) => x.id === practicalId);
+        const tasks = p?.tasks ?? [];
+        const missing = tasks.filter((t) => !completedTasks.includes(t.id));
+        const score = Math.round((completedTasks.length / Math.max(1, tasks.length)) * 100);
+        if (missing.length > 0) return { ok: false, missing, score };
+        const me = profiles.student;
+        setPerformanceLogs((list) => [
+          {
+            id: rid(),
+            studentId: "me",
+            studentName: me?.name ?? "Student",
+            practicalId,
+            practicalTitle: p?.title ?? "Practical",
+            tasksCompleted: tasks.length,
+            tasksTotal: tasks.length,
+            score,
+            completionTime: elapsed,
+            at: now(),
+          },
+          ...list,
+        ]);
+        setStudents((list) =>
+          list.map((s) => (s.id === "me" ? { ...s, score, progress: score } : s)),
+        );
+        setNotices((list) => [
+          { id: rid(), body: `Practical submitted for assessment · ${score}%`, kind: "assessment" as const, at: now() },
+          ...list,
+        ]);
+        return { ok: true, missing: [], score };
+      },
+      endSession: (practicalId) => {
+        const p = practicals.find((x) => x.id === practicalId);
+        const present = students.filter((s) => s.present);
+        // Save a result row for every connected student who has no log yet.
+        setPerformanceLogs((list) => [
+          ...present
+            .filter((s) => !list.some((l) => l.studentId === s.id && l.practicalId === practicalId))
+            .map((s) => ({
+              id: rid(),
+              studentId: s.id,
+              studentName: s.name,
+              practicalId,
+              practicalTitle: p?.title ?? "Practical",
+              tasksCompleted: Math.round(((p?.tasks.length ?? 0) * s.progress) / 100),
+              tasksTotal: p?.tasks.length ?? 0,
+              score: s.score ?? s.progress,
+              completionTime: p?.duration ?? "—",
+              at: now(),
+            })),
+          ...list,
+        ]);
+        patch(practicalId, (x) => ({ ...x, status: "completed" }));
+        setStudents((list) =>
+          list.map((s) => ({ ...s, present: false, handRaised: false, activity: "Session ended" })),
+        );
+        setSharing(false);
+        setPaused(false);
+        setGroups([]);
+        setMyGroup(null);
+        setHandRaised(false);
+        setConnection("offline");
+        setJoinedPracticalId(null);
+        setFeedbackDue(practicalId);
+        setNotices((list) => [
+          { id: rid(), body: "Session ended — all workstations released and results saved", kind: "session" as const, at: now() },
+          ...list,
+        ]);
+      },
+      submitFeedback: (practicalId, rating, comment) => {
+        const author = (role === "instructor" ? profiles.instructor?.name : profiles.student?.name) ?? "Anonymous";
+        setFeedback((list) => [
+          { id: rid(), practicalId, author, role: role ?? "student", rating, comment, at: now() },
+          ...list,
+        ]);
+        setFeedbackDue(null);
+      },
+      dismissFeedback: () => setFeedbackDue(null),
+
       setRole,
       setSharing,
       setPaused,
@@ -448,6 +609,11 @@ export function CampusProvider({ children }: { children: ReactNode }) {
       joinedPracticalId,
       devices,
       patch,
+      performanceLogs,
+      feedback,
+      notices,
+      feedbackDue,
+
 
     ],
   );
