@@ -609,6 +609,11 @@ export function CampusProvider({ children }: { children: ReactNode }) {
       joinedPracticalId,
       devices,
       patch,
+      performanceLogs,
+      feedback,
+      notices,
+      feedbackDue,
+
 
     ],
   );
