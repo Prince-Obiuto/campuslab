@@ -70,15 +70,53 @@ export type ChatMessage = {
 
 export type Announcement = { id: string; body: string; at: string };
 
+/** Performance_Log entity (Table 4.1) — one record per submitted experiment. */
+export type PerformanceLog = {
+  id: string;
+  studentId: string;
+  studentName: string;
+  practicalId: string;
+  practicalTitle: string;
+  tasksCompleted: number;
+  tasksTotal: number;
+  score: number;
+  completionTime: string;
+  at: string;
+};
+
+/** Feedback entity (Table 4.1) — post-session rating and comment. */
+export type Feedback = {
+  id: string;
+  practicalId: string;
+  author: string;
+  role: Role;
+  rating: number;
+  comment: string;
+  at: string;
+};
+
+/** System notification (Section 4.5) — session status changes and instructor messages. */
+export type Notice = {
+  id: string;
+  body: string;
+  kind: "session" | "assessment" | "message";
+  at: string;
+};
+
 export type Profile = {
   role: Role;
   name: string;
   identifier: string;
+  /** Institutional email used by the login form (Section 4.4). */
+  email: string;
+  /** Stored locally only — this prototype authenticates on the device. */
+  password: string;
   /** Level for a student, academic title for an instructor. */
   standing: string;
   unit: string;
   course: string;
 };
+
 
 const initials = (name: string) =>
   name
