@@ -216,6 +216,14 @@ type State = {
   connection: Connection;
   joinedPracticalId: string | null;
   devices: { mic: boolean; cam: boolean };
+  /** Performance_Log records produced by submitted experiments. */
+  performanceLogs: PerformanceLog[];
+  /** Post-session feedback from students and instructors. */
+  feedback: Feedback[];
+  /** System notifications raised by session status changes. */
+  notices: Notice[];
+  /** Set when a session has ended and feedback has not yet been given. */
+  feedbackDue: string | null;
 };
 
 
@@ -223,6 +231,8 @@ type Actions = {
   setRole: (r: Role | null) => void;
   createProfile: (p: Profile) => void;
   deleteProfile: (r: Role) => void;
+  /** Login handler (TC-01 / TC-02): matches email or identifier plus password. */
+  signIn: (r: Role, identifier: string, password: string) => boolean;
   register: (id: string) => void;
   addResource: (practicalId: string, r: Omit<Resource, "id" | "uploadedAt">) => void;
   schedulePractical: (p: {
@@ -252,7 +262,20 @@ type Actions = {
   /** Disconnect from the studio and release the workstation. */
   leaveSession: () => void;
   setDevice: (device: "mic" | "cam", on: boolean) => void;
+  /** Assessment Module: records a submission and returns the missing steps, if any. */
+  submitPractical: (
+    practicalId: string,
+    elapsed: string,
+  ) => { ok: boolean; missing: LabTask[]; score: number };
+  /** Session Management Module: ends the session, disconnects everyone, saves results. */
+  endSession: (practicalId: string) => void;
+  /** Feedback Module: stores a rating and comment for a finished session. */
+  submitFeedback: (practicalId: string, rating: number, comment: string) => void;
+  dismissFeedback: () => void;
+  notify: (body: string, kind?: Notice["kind"]) => void;
+  clearNotices: () => void;
 };
+
 
 const Ctx = createContext<(State & Actions) | null>(null);
 
