@@ -358,6 +358,101 @@ export function CampusProvider({ children }: { children: ReactNode }) {
       connection,
       joinedPracticalId,
       devices,
+      performanceLogs,
+      feedback,
+      notices,
+      feedbackDue,
+      notify: (body, kind = "session") =>
+        setNotices((list) => [{ id: rid(), body, kind, at: now() }, ...list].slice(0, 30)),
+      clearNotices: () => setNotices([]),
+      signIn: (r, identifier, password) => {
+        const p = profiles[r];
+        if (!p) return false;
+        const id = identifier.trim().toLowerCase();
+        const matches = id === p.email.toLowerCase() || id === p.identifier.toLowerCase();
+        if (!matches || password !== p.password) return false;
+        setRole(r);
+        return true;
+      },
+      submitPractical: (practicalId, elapsed) => {
+        const p = practicals.find((x) => x.id === practicalId);
+        const tasks = p?.tasks ?? [];
+        const missing = tasks.filter((t) => !completedTasks.includes(t.id));
+        const score = Math.round((completedTasks.length / Math.max(1, tasks.length)) * 100);
+        if (missing.length > 0) return { ok: false, missing, score };
+        const me = profiles.student;
+        setPerformanceLogs((list) => [
+          {
+            id: rid(),
+            studentId: "me",
+            studentName: me?.name ?? "Student",
+            practicalId,
+            practicalTitle: p?.title ?? "Practical",
+            tasksCompleted: tasks.length,
+            tasksTotal: tasks.length,
+            score,
+            completionTime: elapsed,
+            at: now(),
+          },
+          ...list,
+        ]);
+        setStudents((list) =>
+          list.map((s) => (s.id === "me" ? { ...s, score, progress: score } : s)),
+        );
+        setNotices((list) => [
+          { id: rid(), body: `Practical submitted for assessment · ${score}%`, kind: "assessment" as const, at: now() },
+          ...list,
+        ]);
+        return { ok: true, missing: [], score };
+      },
+      endSession: (practicalId) => {
+        const p = practicals.find((x) => x.id === practicalId);
+        const present = students.filter((s) => s.present);
+        // Save a result row for every connected student who has no log yet.
+        setPerformanceLogs((list) => [
+          ...present
+            .filter((s) => !list.some((l) => l.studentId === s.id && l.practicalId === practicalId))
+            .map((s) => ({
+              id: rid(),
+              studentId: s.id,
+              studentName: s.name,
+              practicalId,
+              practicalTitle: p?.title ?? "Practical",
+              tasksCompleted: Math.round(((p?.tasks.length ?? 0) * s.progress) / 100),
+              tasksTotal: p?.tasks.length ?? 0,
+              score: s.score ?? s.progress,
+              completionTime: p?.duration ?? "—",
+              at: now(),
+            })),
+          ...list,
+        ]);
+        patch(practicalId, (x) => ({ ...x, status: "completed" }));
+        setStudents((list) =>
+          list.map((s) => ({ ...s, present: false, handRaised: false, activity: "Session ended" })),
+        );
+        setSharing(false);
+        setPaused(false);
+        setGroups([]);
+        setMyGroup(null);
+        setHandRaised(false);
+        setConnection("offline");
+        setJoinedPracticalId(null);
+        setFeedbackDue(practicalId);
+        setNotices((list) => [
+          { id: rid(), body: "Session ended — all workstations released and results saved", kind: "session" as const, at: now() },
+          ...list,
+        ]);
+      },
+      submitFeedback: (practicalId, rating, comment) => {
+        const author = (role === "instructor" ? profiles.instructor?.name : profiles.student?.name) ?? "Anonymous";
+        setFeedback((list) => [
+          { id: rid(), practicalId, author, role: role ?? "student", rating, comment, at: now() },
+          ...list,
+        ]);
+        setFeedbackDue(null);
+      },
+      dismissFeedback: () => setFeedbackDue(null),
+
       setRole,
       setSharing,
       setPaused,
