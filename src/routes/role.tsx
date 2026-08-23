@@ -93,7 +93,17 @@ function RoleSelect() {
   const c = copy[active];
   const existing = profiles[active];
 
-  const [form, setForm] = useState({ name: "", identifier: "", standing: "", unit: "", course: "" });
+  const [form, setForm] = useState({
+    name: "",
+    identifier: "",
+    email: "",
+    password: "",
+    standing: "",
+    unit: "",
+    course: "",
+  });
+  const [login, setLogin] = useState({ identifier: "", password: "" });
+
 
   const enter = (r: Role) => {
     setRole(r);
