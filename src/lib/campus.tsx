@@ -295,6 +295,11 @@ export function CampusProvider({ children }: { children: ReactNode }) {
   const [connection, setConnection] = useState<Connection>("offline");
   const [joinedPracticalId, setJoinedPracticalId] = useState<string | null>(null);
   const [devices, setDevices] = useState({ mic: false, cam: true });
+  const [performanceLogs, setPerformanceLogs] = useState<PerformanceLog[]>([]);
+  const [feedback, setFeedback] = useState<Feedback[]>([]);
+  const [notices, setNotices] = useState<Notice[]>([]);
+  const [feedbackDue, setFeedbackDue] = useState<string | null>(null);
+
 
   // The studio handshake: negotiating media and workstation, then live.
   useEffect(() => {
