@@ -87,7 +87,7 @@ const copy: Record<
 };
 
 function RoleSelect() {
-  const { setRole, profiles, createProfile, deleteProfile } = useCampus();
+  const { setRole, profiles, createProfile, deleteProfile, signIn } = useCampus();
   const navigate = useNavigate();
   const [active, setActive] = useState<Role>("student");
   const c = copy[active];
