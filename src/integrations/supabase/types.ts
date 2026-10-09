@@ -240,37 +240,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      can_access_lab_session: {
-        Args: { _session_id: string; _user_id: string }
-        Returns: boolean
-      }
-      can_register_for_practical: {
-        Args: { _practical_id: string; _user_id: string }
-        Returns: boolean
-      }
-      can_send_lab_message: {
-        Args: { _session_id: string; _user_id: string }
-        Returns: boolean
-      }
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
-      is_instructor_for_student: {
-        Args: { _instructor_id: string; _student_id: string }
-        Returns: boolean
-      }
-      is_practical_instructor: {
-        Args: { _practical_id: string; _user_id: string }
-        Returns: boolean
-      }
-      is_practical_member: {
-        Args: { _practical_id: string; _user_id: string }
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
       app_role: "student" | "instructor"
