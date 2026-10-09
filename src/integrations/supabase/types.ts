@@ -14,16 +14,267 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      chat_messages: {
+        Row: {
+          created_at: string
+          id: string
+          lab_session_id: string
+          message_text: string
+          sender_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lab_session_id: string
+          message_text: string
+          sender_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lab_session_id?: string
+          message_text?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_lab_session_id_fkey"
+            columns: ["lab_session_id"]
+            isOneToOne: false
+            referencedRelation: "lab_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lab_sessions: {
+        Row: {
+          created_at: string
+          current_state: Json
+          ended_at: string | null
+          ended_by: string | null
+          id: string
+          is_active: boolean
+          practical_id: string
+          started_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          current_state?: Json
+          ended_at?: string | null
+          ended_by?: string | null
+          id?: string
+          is_active?: boolean
+          practical_id: string
+          started_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          current_state?: Json
+          ended_at?: string | null
+          ended_by?: string | null
+          id?: string
+          is_active?: boolean
+          practical_id?: string
+          started_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lab_sessions_ended_by_fkey"
+            columns: ["ended_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_sessions_practical_id_fkey"
+            columns: ["practical_id"]
+            isOneToOne: true
+            referencedRelation: "practicals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      practical_members: {
+        Row: {
+          practical_id: string
+          registered_at: string
+          student_id: string
+        }
+        Insert: {
+          practical_id: string
+          registered_at?: string
+          student_id: string
+        }
+        Update: {
+          practical_id?: string
+          registered_at?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "practical_members_practical_id_fkey"
+            columns: ["practical_id"]
+            isOneToOne: false
+            referencedRelation: "practicals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "practical_members_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      practicals: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          instructor_id: string
+          lab_topic: string | null
+          scheduled_end: string | null
+          scheduled_start: string | null
+          status: Database["public"]["Enums"]["practical_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          instructor_id: string
+          lab_topic?: string | null
+          scheduled_end?: string | null
+          scheduled_start?: string | null
+          status?: Database["public"]["Enums"]["practical_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          instructor_id?: string
+          lab_topic?: string | null
+          scheduled_end?: string | null
+          scheduled_start?: string | null
+          status?: Database["public"]["Enums"]["practical_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "practicals_instructor_id_fkey"
+            columns: ["instructor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          academic_email: string | null
+          academic_id: string | null
+          created_at: string
+          department: string | null
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          academic_email?: string | null
+          academic_id?: string | null
+          created_at?: string
+          department?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          academic_email?: string | null
+          academic_id?: string | null
+          created_at?: string
+          department?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      can_access_lab_session: {
+        Args: { _session_id: string; _user_id: string }
+        Returns: boolean
+      }
+      can_register_for_practical: {
+        Args: { _practical_id: string; _user_id: string }
+        Returns: boolean
+      }
+      can_send_lab_message: {
+        Args: { _session_id: string; _user_id: string }
+        Returns: boolean
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_instructor_for_student: {
+        Args: { _instructor_id: string; _student_id: string }
+        Returns: boolean
+      }
+      is_practical_instructor: {
+        Args: { _practical_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_practical_member: {
+        Args: { _practical_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "student" | "instructor"
+      practical_status: "scheduled" | "live" | "ended"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +401,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["student", "instructor"],
+      practical_status: ["scheduled", "live", "ended"],
+    },
   },
 } as const
