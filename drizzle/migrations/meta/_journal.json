@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1791552463128,
+      "tag": "0000_virtual_lab_schema_and_room_security",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791552546389,
+      "tag": "0001_secure_virtual_lab_policy_helpers",
+      "breakpoints": true
+    }
+  ]
+}
