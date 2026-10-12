@@ -14,6 +14,38 @@ export type Database = {
   }
   public: {
     Tables: {
+      approved_instructor_emails: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          email: string
+          id: string
+          is_super_admin: boolean
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          email: string
+          id?: string
+          is_super_admin?: boolean
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          email?: string
+          id?: string
+          is_super_admin?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "approved_instructor_emails_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chat_messages: {
         Row: {
           created_at: string
@@ -240,7 +272,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_super_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       app_role: "student" | "instructor"
